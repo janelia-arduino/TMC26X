@@ -101,6 +101,38 @@ private:
   const static uint8_t RDSEL_SG = 0b01;
   const static uint8_t RDSEL_SGCS = 0b11;
 
+  union DrvContStepDir
+  {
+    struct Fields
+    {
+      uint8_t mres : 4;
+      uint8_t space : 4;
+      uint8_t dedge : 1;
+      uint8_t intpol : 1;
+      uint8_t space0 : 8;
+      uint8_t address : 2;
+      uint16_t space1 : 12;
+    } fields;
+    uint32_t uint32;
+  };
+
+  union ChopConf
+  {
+    struct Fields
+    {
+      uint8_t toff : 4;
+      uint8_t hstrt : 3;
+      uint8_t hend : 4;
+      uint8_t hdec : 2;
+      uint8_t rndtf : 1;
+      uint8_t chm : 1;
+      uint8_t tbl : 2;
+      uint8_t address : 3;
+      uint16_t space1 : 12;
+    } fields;
+    uint32_t uint32;
+  };
+
   size_t cs_pin_;
   Status status_;
 

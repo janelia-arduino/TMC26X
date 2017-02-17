@@ -31,6 +31,16 @@ void loop()
 {
   stepper_driver.setStepDirInput();
 
+  TMC26X::Status status = stepper_driver.getStatus();
+  Serial << "status.stall = " << status.stall << "\n";
+  Serial << "status.over_temperature_shutdown = " << status.over_temperature_shutdown << "\n";
+  Serial << "status.over_temperature_warning = " << status.over_temperature_warning << "\n";
+  Serial << "status.short_to_ground_a = " << status.short_to_ground_a << "\n";
+  Serial << "status.short_to_ground_b = " << status.short_to_ground_b << "\n";
+  Serial << "status.open_load_a = " << status.open_load_a << "\n";
+  Serial << "status.open_load_b = " << status.open_load_b << "\n";
+  Serial << "status.standstill = " << status.standstill << "\n";
+
   // stepper_driver.setMode(MOTOR,TMC26X::VELOCITY_MODE);
   // stepper_driver.setMode(MOTOR,TMC26X::RAMP_MODE);
 

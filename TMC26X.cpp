@@ -33,10 +33,35 @@ void TMC26X::setStepDirInput()
   drv_conf.fields.address = ADDRESS_DRVCONF;
   Serial << "drv_conf: " << _HEX(drv_conf.uint32) << "\n";
   // writeRead(drv_conf.uint32);
+
+  DrvContStepDir drv_cont;
+  drv_cont.uint32 = 0;
+  drv_cont.fields.mres = 0;
+  drv_cont.fields.dedge = 0;
+  drv_cont.fields.intpol = 0;
+  drv_cont.fields.address = ADDRESS_DRVCTRL;
+  Serial << "drv_cont: " << _HEX(drv_cont.uint32) << "\n";
+
+  ChopConf chop_conf;
+  chop_conf.uint32 = 0;
+  chop_conf.fields.toff = 1;
+  chop_conf.fields.hstrt = 0b011;
+  chop_conf.fields.hend = 0b0010;
+  chop_conf.fields.hdec = 0b00;
+  chop_conf.fields.rndtf = 0;
+  chop_conf.fields.chm = 0;
+  chop_conf.fields.tbl = 0b10;
+  chop_conf.fields.address = ADDRESS_CHOPCONF;
+  Serial << "chop_conf: " << _HEX(chop_conf.uint32) << "\n";
 }
 
 void TMC26X::setSpiInput()
 {
+}
+
+TMC26X::Status TMC26X::getStatus()
+{
+  return status_;
 }
 
 // private
@@ -45,6 +70,7 @@ TMC26X::MisoDatagram TMC26X::writeRead(const uint32_t data)
   MosiDatagram datagram_write;
   datagram_write.uint32 = 0;
   datagram_write.fields.data = data;
+  Serial << "mosi datagram: " << _HEX(datagram_write.uint32) << "\n";
   MisoDatagram datagram_read;
   datagram_read.uint32 = 0;
   SPI.beginTransaction(SPISettings(SPI_CLOCK,SPI_BIT_ORDER,SPI_MODE));
@@ -60,5 +86,6 @@ TMC26X::MisoDatagram TMC26X::writeRead(const uint32_t data)
   noInterrupts();
   status_ = datagram_read.fields.status;
   interrupts();
+  Serial << "miso datagram: " << _HEX(datagram_read.uint32) << "\n";
   return datagram_read;
 }
