@@ -11,11 +11,38 @@
 void TMC26X::setup(const size_t cs_pin)
 {
   cs_pin_ = cs_pin;
+  enable_pin_ = -1;
 
   pinMode(cs_pin_,OUTPUT);
   digitalWrite(cs_pin_,HIGH);
 
   SPI.begin();
+
+  setStepDirInput();
+  setDefaultChopperConfig();
+}
+
+void TMC26X::setup(const size_t cs_pin,
+                   const size_t enable_pin)
+{
+  setup(cs_pin);
+  setEnablePin(enable_pin);
+}
+
+void TMC26X::enable()
+{
+  if (enable_pin_ >= 0)
+  {
+    digitalWrite(enable_pin_,LOW);
+  }
+}
+
+void TMC26X::disable()
+{
+  if (enable_pin_ >= 0)
+  {
+    digitalWrite(enable_pin_,HIGH);
+  }
 }
 
 void TMC26X::setStepDirInput()
@@ -40,118 +67,92 @@ void TMC26X::setStepDirInput()
 //                SLP_MAXIMUM);
 // }
 
-void TMC26X::setMicrostepsPerStepTo256()
+void TMC26X::setMicrostepsPerStepPowerOfTwo(const uint8_t exponent)
 {
-  setDriverControlStepDir(MRES_256,
-                          DEDGE_RISING,
-                          INTPOL_DISABLE_INTERPOLATION);
-}
+  microsteps_per_step_exponent_ = exponent;
 
-void TMC26X::setMicrostepsPerStepTo128()
-{
-  setDriverControlStepDir(MRES_128,
-                          DEDGE_RISING,
-                          INTPOL_DISABLE_INTERPOLATION);
-}
-
-void TMC26X::setMicrostepsPerStepTo64()
-{
-  setDriverControlStepDir(MRES_064,
-                          DEDGE_RISING,
-                          INTPOL_DISABLE_INTERPOLATION);
-}
-
-void TMC26X::setMicrostepsPerStepTo32()
-{
-  setDriverControlStepDir(MRES_032,
-                          DEDGE_RISING,
-                          INTPOL_DISABLE_INTERPOLATION);
-}
-
-void TMC26X::setMicrostepsPerStepTo16()
-{
-  setDriverControlStepDir(MRES_016,
-                          DEDGE_RISING,
-                          INTPOL_DISABLE_INTERPOLATION);
-}
-
-void TMC26X::setMicrostepsPerStepTo8()
-{
-  setDriverControlStepDir(MRES_008,
-                          DEDGE_RISING,
-                          INTPOL_DISABLE_INTERPOLATION);
-}
-
-void TMC26X::setMicrostepsPerStepTo4()
-{
-  setDriverControlStepDir(MRES_004,
-                          DEDGE_RISING,
-                          INTPOL_DISABLE_INTERPOLATION);
-}
-
-void TMC26X::setMicrostepsPerStepTo2()
-{
-  setDriverControlStepDir(MRES_002,
-                          DEDGE_RISING,
-                          INTPOL_DISABLE_INTERPOLATION);
-}
-
-void TMC26X::setMicrostepsPerStepTo1()
-{
-  setDriverControlStepDir(MRES_001,
-                          DEDGE_RISING,
-                          INTPOL_DISABLE_INTERPOLATION);
-}
-
-void TMC26X::setDefaultChopperConfig()
-{
-  configChopper(1,
-                0b011,
-                0b0010,
-                0b00,
-                0,
-                0,
-                0b10);
-}
-
-void TMC26X::disableCoolStep()
-{
-  setCoolStepRegister(SEMIN_DISABLED,
-                      SEUP_1,
-                      0b00,
-                      SEDN_32,
-                      SEIMIN_HALF);
-}
-
-// void TMC26X::enableCoolStep()
-// {
-//   setCoolStepRegister(SEMIN_DISABLED,
-//                              SEUP_1,
-//                              0b00,
-//                              SEDN_32,
-//                              SEIMIN_HALF);
-// }
-
-double TMC26X::setCurrentScalePercent(uint8_t cs)
-{
-  uint8_t cs_thresholded = cs;
-  if (cs_thresholded > CURRENT_SCALE_PERCENT_MAX)
+  switch (exponent)
   {
-    cs_thresholded = CURRENT_SCALE_PERCENT_MAX;
+    case 0:
+    {
+      setDriverControlStepDir(MRES_001,
+                              DEDGE_RISING,
+                              INTPOL_DISABLE_INTERPOLATION);
+      break;
+    }
+    case 1:
+    {
+      setDriverControlStepDir(MRES_002,
+                              DEDGE_RISING,
+                              INTPOL_DISABLE_INTERPOLATION);
+      break;
+    }
+    case 2:
+    {
+      setDriverControlStepDir(MRES_004,
+                              DEDGE_RISING,
+                              INTPOL_DISABLE_INTERPOLATION);
+      break;
+    }
+    case 3:
+    {
+      setDriverControlStepDir(MRES_008,
+                              DEDGE_RISING,
+                              INTPOL_DISABLE_INTERPOLATION);
+      break;
+    }
+    case 4:
+    {
+      setDriverControlStepDir(MRES_016,
+                              DEDGE_RISING,
+                              INTPOL_DISABLE_INTERPOLATION);
+      break;
+    }
+    case 5:
+    {
+      setDriverControlStepDir(MRES_032,
+                              DEDGE_RISING,
+                              INTPOL_DISABLE_INTERPOLATION);
+      break;
+    }
+    case 6:
+    {
+      setDriverControlStepDir(MRES_064,
+                              DEDGE_RISING,
+                              INTPOL_DISABLE_INTERPOLATION);
+      break;
+    }
+    case 7:
+    {
+      setDriverControlStepDir(MRES_128,
+                              DEDGE_RISING,
+                              INTPOL_DISABLE_INTERPOLATION);
+      break;
+    }
+    case 8:
+    default:
+    {
+      microsteps_per_step_exponent_ = MICROSTEPS_PER_STEP_EXPONENT_MAX;
+      setDriverControlStepDir(MRES_256,
+                              DEDGE_RISING,
+                              INTPOL_DISABLE_INTERPOLATION);
+      break;
+    }
   }
-  if (cs_thresholded < CURRENT_SCALE_PERCENT_MIN)
-  {
-    cs_thresholded = CURRENT_SCALE_PERCENT_MIN;
-  }
-  uint8_t cs_mapped = betterMap(cs_thresholded,
-                                CURRENT_SCALE_PERCENT_MIN,
-                                CURRENT_SCALE_PERCENT_MAX,
-                                CS_REGISTER_MIN,
-                                CS_REGISTER_MAX);
-  setStallGuardRegister(cs_mapped,
+  setChopperConfig();
+}
+
+size_t TMC26X::getMicrostepsPerStep()
+{
+  return 1 << microsteps_per_step_exponent_;
+}
+
+void TMC26X::setRunCurrent(const uint8_t percent)
+{
+  uint8_t run_current = percentToCurrentSetting(percent);
+  setStallGuardRegister(run_current,
                         SGT_DEFAULT,
                         SFILT_FILTERED_MODE);
-  return (cs_mapped + 1)*100.0/32;
 }
 
 // TMC26X::Status TMC26X::getStatus()
@@ -160,6 +161,14 @@ double TMC26X::setCurrentScalePercent(uint8_t cs)
 // }
 
 // private
+void TMC26X::setEnablePin(const size_t enable_pin)
+{
+  enable_pin_ = enable_pin;
+
+  pinMode(enable_pin_,OUTPUT);
+  disable();
+}
+
 TMC26X::MisoDatagram TMC26X::writeRead(const uint32_t data)
 {
   MosiDatagram datagram_write;
@@ -218,6 +227,17 @@ void TMC26X::setDriverControlStepDir(const uint8_t mres,
   writeRead(drv_cont.uint32);
 }
 
+void TMC26X::setDefaultChopperConfig()
+{
+  configChopper(1,
+                0b011,
+                0b0010,
+                0b00,
+                0,
+                0,
+                0b10);
+}
+
 void TMC26X::configChopper(const uint8_t toff,
                            const uint8_t hstrt,
                            const uint8_t hend,
@@ -239,6 +259,24 @@ void TMC26X::configChopper(const uint8_t toff,
   writeRead(chop_conf.uint32);
 }
 
+void TMC26X::disableCoolStep()
+{
+  setCoolStepRegister(SEMIN_DISABLED,
+                      SEUP_1,
+                      0b00,
+                      SEDN_32,
+                      SEIMIN_HALF);
+}
+
+// void TMC26X::enableCoolStep()
+// {
+//   setCoolStepRegister(SEMIN_DISABLED,
+//                              SEUP_1,
+//                              0b00,
+//                              SEDN_32,
+//                              SEIMIN_HALF);
+// }
+
 void TMC26X::setCoolStepRegister(const uint8_t semin,
                                  const uint8_t seup,
                                  const uint8_t semax,
@@ -254,6 +292,13 @@ void TMC26X::setCoolStepRegister(const uint8_t semin,
   smart_en.fields.seimin = seimin;
   smart_en.fields.address = ADDRESS_SMARTEN;
   writeRead(smart_en.uint32);
+}
+
+uint8_t TMC26X::percentToCurrentSetting(uint8_t percent)
+{
+  uint8_t current_percent = constrain(percent,PERCENT_MIN,PERCENT_MAX);
+  uint8_t current_setting = map(current_percent,PERCENT_MIN,PERCENT_MAX,CS_REGISTER_MIN,CS_REGISTER_MAX);
+  return current_setting;
 }
 
 void TMC26X::setStallGuardRegister(const uint8_t cs,
@@ -276,10 +321,4 @@ void TMC26X::setStallGuardRegister(const uint8_t cs,
   sgcs_conf.fields.sfilt = sfilt;
   sgcs_conf.fields.address = ADDRESS_SGCSCONF;
   writeRead(sgcs_conf.uint32);
-}
-
-long TMC26X::betterMap(long x, long in_min, long in_max, long out_min, long out_max)
-{
-  long mapped_x = map(x,in_min,(in_max+1),out_min,(out_max+1));
-  return constrain(mapped_x,out_min,out_max);
 }

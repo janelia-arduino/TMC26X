@@ -21,17 +21,10 @@ void setup()
 
 void loop()
 {
-  stepper_driver.setStepDirInput();
-  Serial << "setStepDirInput\n";
-  stepper_driver.setMicrostepsPerStepTo256();
-  Serial << "setMicrostepsPerStepTo256\n";
-  stepper_driver.setDefaultChopperConfig();
-  Serial << "setDefaultChopperConfig\n";
-  stepper_driver.disableCoolStep();
-  Serial << "disableCoolStep\n";
-  uint8_t current_scale_set = 18;
-  double current_scale_actual = stepper_driver.setCurrentScalePercent(current_scale_set);
-  Serial << "current_scale_percent set: " << current_scale_set << ", actual: " << current_scale_actual << "\n";
+  stepper_driver.setMicrostepsPerStepPowerOfTwo(8);
+  Serial << "setMicrostepsPerStepToPowerOfTwo(8)\n";
+  uint8_t current_percent = 18;
+  stepper_driver.setRunCurrent(current_percent);
 
   // TMC26X::Status status = stepper_driver.getStatus();
   // Serial << "status.stall = " << status.stall << "\n";

@@ -21,40 +21,20 @@ class TMC26X
 {
 public:
   void setup(const size_t cs_pin);
+  void setup(const size_t cs_pin,
+             const size_t enable_pin);
+
+  void enable();
+  void disable();
 
   void setStepDirInput();
   // void setSpiInput();
 
-  void setMicrostepsPerStepTo256();
-  void setMicrostepsPerStepTo128();
-  void setMicrostepsPerStepTo64();
-  void setMicrostepsPerStepTo32();
-  void setMicrostepsPerStepTo16();
-  void setMicrostepsPerStepTo8();
-  void setMicrostepsPerStepTo4();
-  void setMicrostepsPerStepTo2();
-  void setMicrostepsPerStepTo1();
+  // microsteps = 2^exponent, 0=1,1=2,2=4,...8=256
+  void setMicrostepsPerStepPowerOfTwo(const uint8_t exponent);
+  size_t getMicrostepsPerStep();
 
-  void setDefaultChopperConfig();
-
-  void disableCoolStep();
-  // void enableCoolStep();
-
-  double setCurrentScalePercent(uint8_t cs);
-  const static uint8_t CURRENT_SCALE_PERCENT_MIN = 1;
-  const static uint8_t CURRENT_SCALE_PERCENT_MAX = 100;
-
-  struct Status
-  {
-    uint8_t stall : 1;
-    uint8_t over_temperature_shutdown : 1;
-    uint8_t over_temperature_warning : 1;
-    uint8_t short_to_ground_a : 1;
-    uint8_t short_to_ground_b : 1;
-    uint8_t open_load_a : 1;
-    uint8_t open_load_b : 1;
-    uint8_t standstill : 1;
-  };
+  void setRunCurrent(const uint8_t percent);
 
   // Status getStatus();
 
@@ -81,6 +61,18 @@ private:
   const static uint8_t ADDRESS_SMARTEN = 0b101;
   const static uint8_t ADDRESS_SGCSCONF = 0b110;
   const static uint8_t ADDRESS_DRVCONF = 0b111;
+
+  struct Status
+  {
+    uint8_t stall : 1;
+    uint8_t over_temperature_shutdown : 1;
+    uint8_t over_temperature_warning : 1;
+    uint8_t short_to_ground_a : 1;
+    uint8_t short_to_ground_b : 1;
+    uint8_t open_load_a : 1;
+    uint8_t open_load_b : 1;
+    uint8_t standstill : 1;
+  };
 
   // MISO Datagrams
   union MisoDatagram
@@ -248,8 +240,18 @@ private:
   const static uint8_t SFILT_STANDARD_MODE = 0b0;
   const static uint8_t SFILT_FILTERED_MODE = 0b1;
 
+  const static uint8_t PERCENT_MIN = 0;
+  const static uint8_t PERCENT_MAX = 100;
+
   size_t cs_pin_;
+  int enable_pin_;
+
+  const static uint8_t MICROSTEPS_PER_STEP_EXPONENT_MAX = 8;
+  uint8_t microsteps_per_step_exponent_;
+
   Status status_;
+
+  void setEnablePin(const size_t enable_pin);
 
   MisoDatagram writeRead(const uint32_t data);
 
@@ -263,6 +265,7 @@ private:
   void setDriverControlStepDir(const uint8_t mres,
                                const uint8_t dedge,
                                const uint8_t intpol);
+  void setDefaultChopperConfig();
   void configChopper(const uint8_t toff,
                      const uint8_t hstrt,
                      const uint8_t hend,
@@ -270,19 +273,17 @@ private:
                      const uint8_t rndtf,
                      const uint8_t chm,
                      const uint8_t tbl);
+  void disableCoolStep();
+  // void enableCoolStep();
   void setCoolStepRegister(const uint8_t semin,
                            const uint8_t seup,
                            const uint8_t semax,
                            const uint8_t sedn,
                            const uint8_t seimin);
+  uint8_t percentToCurrentSetting(uint8_t percent);
   void setStallGuardRegister(const uint8_t cs,
                              const int8_t sgt,
                              const uint8_t sfilt);
-  long betterMap(long x,
-                 long in_min,
-                 long in_max,
-                 long out_min,
-                 long out_max);
 
 };
 
