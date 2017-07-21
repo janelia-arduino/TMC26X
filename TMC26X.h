@@ -24,19 +24,32 @@ public:
   void setup(const size_t cs_pin,
              const size_t enable_pin);
 
+  void initialize();
+
   void enable();
   void disable();
 
-  void setStepDirInput();
-  // void setSpiInput();
+  // uint8_t getVersion();
+  // bool checkVersion();
 
-  // microsteps = 2^exponent, 0=1,1=2,2=4,...8=256
-  void setMicrostepsPerStepPowerOfTwo(const uint8_t exponent);
+  // valid values = 1,2,4,8,...128,256, other values get rounded down
+  void setMicrostepsPerStep(const size_t microsteps_per_step);
   size_t getMicrostepsPerStep();
 
   void setRunCurrent(const uint8_t percent);
 
-  // Status getStatus();
+  struct Status
+  {
+    uint8_t stall : 1;
+    uint8_t over_temperature_shutdown : 1;
+    uint8_t over_temperature_warning : 1;
+    uint8_t short_to_ground_a : 1;
+    uint8_t short_to_ground_b : 1;
+    uint8_t open_load_a : 1;
+    uint8_t open_load_b : 1;
+    uint8_t standstill : 1;
+  };
+  Status getStatus();
 
 private:
   // SPISettings
@@ -61,18 +74,6 @@ private:
   const static uint8_t ADDRESS_SMARTEN = 0b101;
   const static uint8_t ADDRESS_SGCSCONF = 0b110;
   const static uint8_t ADDRESS_DRVCONF = 0b111;
-
-  struct Status
-  {
-    uint8_t stall : 1;
-    uint8_t over_temperature_shutdown : 1;
-    uint8_t over_temperature_warning : 1;
-    uint8_t short_to_ground_a : 1;
-    uint8_t short_to_ground_b : 1;
-    uint8_t open_load_a : 1;
-    uint8_t open_load_b : 1;
-    uint8_t standstill : 1;
-  };
 
   // MISO Datagrams
   union MisoDatagram
@@ -252,6 +253,12 @@ private:
   Status status_;
 
   void setEnablePin(const size_t enable_pin);
+
+  void setStepDirInput();
+  // void setSpiInput();
+
+  // microsteps = 2^exponent, 0=1,1=2,2=4,...8=256
+  void setMicrostepsPerStepPowerOfTwo(const uint8_t exponent);
 
   MisoDatagram writeRead(const uint32_t data);
 

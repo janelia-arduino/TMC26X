@@ -17,9 +17,6 @@ void TMC26X::setup(const size_t cs_pin)
   digitalWrite(cs_pin_,HIGH);
 
   SPI.begin();
-
-  setStepDirInput();
-  setDefaultChopperConfig();
 }
 
 void TMC26X::setup(const size_t cs_pin,
@@ -27,6 +24,12 @@ void TMC26X::setup(const size_t cs_pin,
 {
   setup(cs_pin);
   setEnablePin(enable_pin);
+}
+
+void TMC26X::initialize()
+{
+  setStepDirInput();
+  setDefaultChopperConfig();
 }
 
 void TMC26X::enable()
@@ -43,6 +46,57 @@ void TMC26X::disable()
   {
     digitalWrite(enable_pin_,HIGH);
   }
+}
+
+// uint8_t TMC26X::getVersion()
+// {
+// }
+
+// bool TMC26X::checkVersion()
+// {
+//   return (getVersion() == VERSION);
+// }
+
+void TMC26X::setMicrostepsPerStep(const size_t microsteps_per_step)
+{
+  size_t microsteps_per_step_shifted = constrain(microsteps_per_step,
+                                                 MICROSTEPS_PER_STEP_MIN,
+                                                 MICROSTEPS_PER_STEP_MAX);
+  microsteps_per_step_shifted = microsteps_per_step >> 1;
+  size_t exponent = 0;
+  while (microsteps_per_step_shifted > 0)
+  {
+    microsteps_per_step_shifted = microsteps_per_step_shifted >> 1;
+    ++exponent;
+  }
+  setMicrostepsPerStepPowerOfTwo(exponent);
+}
+
+size_t TMC26X::getMicrostepsPerStep()
+{
+  return 1 << microsteps_per_step_exponent_;
+}
+
+void TMC26X::setRunCurrent(const uint8_t percent)
+{
+  uint8_t run_current = percentToCurrentSetting(percent);
+  setStallGuardRegister(run_current,
+                        SGT_DEFAULT,
+                        SFILT_FILTERED_MODE);
+}
+
+TMC26X::Status TMC26X::getStatus()
+{
+  return status_;
+}
+
+// private
+void TMC26X::setEnablePin(const size_t enable_pin)
+{
+  enable_pin_ = enable_pin;
+
+  pinMode(enable_pin_,OUTPUT);
+  disable();
 }
 
 void TMC26X::setStepDirInput()
@@ -140,33 +194,6 @@ void TMC26X::setMicrostepsPerStepPowerOfTwo(const uint8_t exponent)
     }
   }
   setChopperConfig();
-}
-
-size_t TMC26X::getMicrostepsPerStep()
-{
-  return 1 << microsteps_per_step_exponent_;
-}
-
-void TMC26X::setRunCurrent(const uint8_t percent)
-{
-  uint8_t run_current = percentToCurrentSetting(percent);
-  setStallGuardRegister(run_current,
-                        SGT_DEFAULT,
-                        SFILT_FILTERED_MODE);
-}
-
-// TMC26X::Status TMC26X::getStatus()
-// {
-//   return status_;
-// }
-
-// private
-void TMC26X::setEnablePin(const size_t enable_pin)
-{
-  enable_pin_ = enable_pin;
-
-  pinMode(enable_pin_,OUTPUT);
-  disable();
 }
 
 TMC26X::MisoDatagram TMC26X::writeRead(const uint32_t data)
