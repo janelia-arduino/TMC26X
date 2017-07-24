@@ -26,6 +26,15 @@ void TMC26X::setup(const size_t cs_pin,
   setEnablePin(enable_pin);
 }
 
+// bool TMC26X::communicating()
+// {
+//   return (getVersion() == VERSION);
+// }
+
+// uint8_t TMC26X::getVersion()
+// {
+// }
+
 void TMC26X::initialize()
 {
   setStepDirInput();
@@ -47,15 +56,6 @@ void TMC26X::disable()
     digitalWrite(enable_pin_,HIGH);
   }
 }
-
-// uint8_t TMC26X::getVersion()
-// {
-// }
-
-// bool TMC26X::checkVersion()
-// {
-//   return (getVersion() == VERSION);
-// }
 
 void TMC26X::setMicrostepsPerStep(const size_t microsteps_per_step)
 {
