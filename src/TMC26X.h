@@ -4,17 +4,10 @@
 // Authors:
 // Peter Polidoro polidorop@janelia.hhmi.org
 // ----------------------------------------------------------------------------
-
 #ifndef TMC26X_H
 #define TMC26X_H
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
-#include "SPI.h"
-
-#include "Streaming.h"
+#include <Arduino.h>
+#include <SPI.h>
 
 
 class TMC26X

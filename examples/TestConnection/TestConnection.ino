@@ -1,7 +1,8 @@
-#include "Arduino.h"
-#include "SPI.h"
-#include "Streaming.h"
-#include "TMC26X.h"
+#include <Arduino.h>
+#include <SPI.h>
+#include <Streaming.h>
+#include <TMC26X.h>
+
 
 const long BAUDRATE = 115200;
 const int LOOP_DELAY = 2000;
