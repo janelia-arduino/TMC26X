@@ -1,0 +1,18 @@
+#+TITLE: TMC26X
+#+AUTHOR: Peter Polidoro
+#+EMAIL: peterpolidoro@gmail.com
+
+* Library Information
+  - Author :: Peter Polidoro
+  - License :: BSD
+
+  The Trinamic TMC26X are a family of stepper drivers with step and
+  direction and SPI inputs.
+
+* Library Examples
+
+  [[./examples]]
+
+* Library Dependencies
+
+  [[https://github.com/janelia-arduino/arduino-libraries][arduino-libraries]]
