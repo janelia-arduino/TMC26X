@@ -2,7 +2,7 @@
 // TMC26X.h
 //
 // Authors:
-// Peter Polidoro polidorop@janelia.hhmi.org
+// Peter Polidoro peterpolidoro@gmail.com
 // ----------------------------------------------------------------------------
 #ifndef TMC26X_H
 #define TMC26X_H
