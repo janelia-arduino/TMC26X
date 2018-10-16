@@ -13,9 +13,9 @@
 class TMC26X
 {
 public:
-  void setup(const size_t cs_pin);
-  void setup(const size_t cs_pin,
-    const size_t enable_pin);
+  void setup(size_t cs_pin);
+  void setup(size_t cs_pin,
+    size_t enable_pin);
 
   // bool communicating();
   // uint8_t getVersion();
@@ -26,10 +26,10 @@ public:
   void disable();
 
   // valid values = 1,2,4,8,...128,256, other values get rounded down
-  void setMicrostepsPerStep(const size_t microsteps_per_step);
+  void setMicrostepsPerStep(size_t microsteps_per_step);
   size_t getMicrostepsPerStep();
 
-  void setRunCurrent(const uint8_t percent);
+  void setRunCurrent(uint8_t percent);
 
   struct Status
   {
@@ -245,45 +245,45 @@ private:
 
   Status status_;
 
-  void setEnablePin(const size_t enable_pin);
+  void setEnablePin(size_t enable_pin);
 
   void setStepDirInput();
   // void setSpiInput();
 
   // microsteps = 2^exponent, 0=1,1=2,2=4,...8=256
-  void setMicrostepsPerStepPowerOfTwo(const uint8_t exponent);
+  void setMicrostepsPerStepPowerOfTwo(uint8_t exponent);
 
-  MisoDatagram writeRead(const uint32_t data);
+  MisoDatagram writeRead(uint32_t data);
 
-  void configDriver(const uint8_t rdsel,
-    const uint8_t vsense,
-    const uint8_t sdoff,
-    const uint8_t ts2g,
-    const uint8_t diss2g,
-    const uint8_t slpl,
-    const uint8_t slph);
-  void setDriverControlStepDir(const uint8_t mres,
-    const uint8_t dedge,
-    const uint8_t intpol);
+  void configDriver(uint8_t rdsel,
+    uint8_t vsense,
+    uint8_t sdoff,
+    uint8_t ts2g,
+    uint8_t diss2g,
+    uint8_t slpl,
+    uint8_t slph);
+  void setDriverControlStepDir(uint8_t mres,
+    uint8_t dedge,
+    uint8_t intpol);
   void setDefaultChopperConfig();
-  void configChopper(const uint8_t toff,
-    const uint8_t hstrt,
-    const uint8_t hend,
-    const uint8_t hdec,
-    const uint8_t rndtf,
-    const uint8_t chm,
-    const uint8_t tbl);
+  void configChopper(uint8_t toff,
+    uint8_t hstrt,
+    uint8_t hend,
+    uint8_t hdec,
+    uint8_t rndtf,
+    uint8_t chm,
+    uint8_t tbl);
   void disableCoolStep();
   // void enableCoolStep();
-  void setCoolStepRegister(const uint8_t semin,
-    const uint8_t seup,
-    const uint8_t semax,
-    const uint8_t sedn,
-    const uint8_t seimin);
+  void setCoolStepRegister(uint8_t semin,
+    uint8_t seup,
+    uint8_t semax,
+    uint8_t sedn,
+    uint8_t seimin);
   uint8_t percentToCurrentSetting(uint8_t percent);
-  void setStallGuardRegister(const uint8_t cs,
-    const int8_t sgt,
-    const uint8_t sfilt);
+  void setStallGuardRegister(uint8_t cs,
+    int8_t sgt,
+    uint8_t sfilt);
 
 };
 
